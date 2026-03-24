@@ -1,0 +1,33 @@
+[package]
+name = "parquet_viewer"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "ParquetViewer"
+path = "src/main.rs"
+
+[dependencies]
+eframe = { version = "0.31", features = ["default"] }
+egui = "0.31"
+egui_extras = { version = "0.31", features = ["default"] }
+arrow = { version = "54", default-features = false, features = ["ipc"] }
+parquet = { version = "54", default-features = false, features = ["arrow", "snap"] }
+rfd = "0.15"
+pollster = "0.4"
+image = { version = "0.25", default-features = false, features = ["png"] }
+
+[build-dependencies]
+image = { version = "0.25", default-features = false, features = ["png", "ico"] }
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.release.package."*"]
+opt-level = 3
