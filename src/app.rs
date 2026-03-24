@@ -77,14 +77,20 @@ pub struct ParquetApp {
 
 impl ParquetApp {
     pub fn new(cc: &eframe::CreationContext<'_>, initial_file: Option<String>) -> Self {
+        let dark_mode = cc.storage
+            .and_then(|s| s.get_string("dark_mode"))
+            .map(|v| v != "false")
+            .unwrap_or(true);
+
         let mut app = Self {
             state:       State::Empty,
             rx:          None,
             search:      String::new(),
             show_search: false,
-            dark_mode:   true,
+            dark_mode,
         };
-        style_egui(&cc.egui_ctx, &Palette::dark(), true);
+        let palette = if dark_mode { Palette::dark() } else { Palette::light() };
+        style_egui(&cc.egui_ctx, &palette, dark_mode);
         if let Some(path) = initial_file {
             app.start_load(path);
         }
@@ -135,6 +141,10 @@ impl ParquetApp {
 }
 
 impl eframe::App for ParquetApp {
+    fn save(&mut self, storage: &mut dyn eframe::Storage) {
+        storage.set_string("dark_mode", self.dark_mode.to_string());
+    }
+
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let palette = if self.dark_mode { Palette::dark() } else { Palette::light() };
 
@@ -189,7 +199,7 @@ impl eframe::App for ParquetApp {
                     ui.label(RichText::new("Ctrl+O  open   Ctrl+F  search").color(palette.muted).size(11.0));
 
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        let label = if self.dark_mode { "☀ Light" } else { "☽ Dark" };
+                        let label = if self.dark_mode { "☀ Light" } else { "🌙 Dark" };
                         if ui.add(egui::Button::new(
                             RichText::new(label).color(palette.muted).size(12.0)
                         ).frame(false)).clicked() {
@@ -238,6 +248,18 @@ impl eframe::App for ParquetApp {
                             ui.label(RichText::new(format!("Error: {e}")).color(Color32::from_rgb(230, 80, 80)).size(12.0));
                         }
                     }
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        let resp = ui.add(
+                            egui::Label::new(
+                                RichText::new("Created by Jakob Aungiers")
+                                    .color(palette.muted)
+                                    .size(11.0)
+                            ).sense(egui::Sense::click())
+                        ).on_hover_cursor(egui::CursorIcon::PointingHand);
+                        if resp.clicked() {
+                            ui.ctx().open_url(egui::OpenUrl::new_tab("https://jakob-aungiers.com"));
+                        }
+                    });
                 });
             });
 

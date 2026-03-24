@@ -8,7 +8,7 @@ name = "ParquetViewer"
 path = "src/main.rs"
 
 [dependencies]
-eframe = { version = "0.31", features = ["default"] }
+eframe = { version = "0.31", features = ["default", "persistence"] }
 egui = "0.31"
 egui_extras = { version = "0.31", features = ["default"] }
 arrow = { version = "54", default-features = false, features = ["ipc"] }
