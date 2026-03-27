@@ -342,6 +342,9 @@ fn draw_table(
 
     let mut sort_request: Option<usize> = None;
 
+    egui::ScrollArea::horizontal()
+        .id_salt("table_hscroll")
+        .show(ui, |ui| {
     let mut builder = TableBuilder::new(ui)
         .striped(false)
         .cell_layout(egui::Layout::left_to_right(egui::Align::Center))
@@ -492,6 +495,8 @@ fn draw_table(
                 }
             });
         });
+
+    }); // end ScrollArea::horizontal
 
     if let Some(col) = sort_request {
         ts.sort_by(col, &data.rows);
